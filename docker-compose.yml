@@ -1,0 +1,65 @@
+# Full stack: Django (gunicorn) + PostgreSQL + Redis + Celery worker + Celery beat.
+#   docker compose up --build
+#   docker compose exec web python manage.py seed_demo
+
+x-app: &app
+  build: .
+  environment: &app-env
+    DJANGO_SETTINGS_MODULE: config.settings.production
+    SECRET_KEY: ${SECRET_KEY:-change-me-in-production-please-0123456789}
+    ALLOWED_HOSTS: localhost,127.0.0.1,web
+    SECURE_SSL_REDIRECT: "False"
+    DATABASE_URL: postgres://tenantly:tenantly@db:5432/tenantly
+    REDIS_URL: redis://redis:6379/0
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  web:
+    <<: *app
+    environment:
+      <<: *app-env
+      RUN_MIGRATIONS: "1"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health/')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    <<: *app
+    command: celery -A config worker --loglevel=info
+
+  beat:
+    <<: *app
+    command: celery -A config beat --loglevel=info --schedule /tmp/celerybeat-schedule
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: tenantly
+      POSTGRES_USER: tenantly
+      POSTGRES_PASSWORD: tenantly
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tenantly"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
