@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "apps.organizations",
     "apps.apikeys",
     "apps.billing",
+    "apps.metering",
 ]
 
 MIDDLEWARE = [
