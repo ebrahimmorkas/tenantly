@@ -55,6 +55,8 @@ def create_invoice(organization, *, subscription: Subscription | None = None, no
         return None
 
     currency = items[0].currency
+    if subscription is None:
+        subscription = next((i.subscription for i in items if i.subscription_id), None)
     subtotal = sum(item.amount for item in items)
     total = max(subtotal, 0)
 
