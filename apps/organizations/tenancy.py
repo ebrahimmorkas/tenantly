@@ -6,16 +6,19 @@ caller's membership *once per request*. Non-members get a 404 (not 403) so the
 existence of other tenants is never revealed.
 
 Querysets in tenant-scoped views must always be filtered by
-``self.organization``; :meth:`OrganizationScopedMixin.scope` does that.
+``self.organization``; :meth:`OrganizationScopedMixin.scope` does that. All
+tenant-scoped endpoints also honour the ``Idempotency-Key`` header.
 """
 
 from django.http import Http404
 from rest_framework.permissions import BasePermission
 
+from apps.core.idempotency import IdempotencyMixin
+
 from .models import ROLE_RANK, Membership, Organization, Role
 
 
-class OrganizationScopedMixin:
+class OrganizationScopedMixin(IdempotencyMixin):
     organization: Organization
     membership: Membership | None
 
