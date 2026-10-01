@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.apikeys",
     "apps.billing",
     "apps.metering",
+    "apps.invoicing",
 ]
 
 MIDDLEWARE = [
@@ -91,6 +92,27 @@ if REDIS_URL:
     }
 else:
     CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+
+# --- Celery ---------------------------------------------------------------------
+# With a broker, the billing run is scheduled by beat and emails are sent by workers.
+# Without one, tasks run eagerly in-process; run ``manage.py run_billing`` from cron.
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=REDIS_URL)
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=REDIS_URL or None)
+CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=not CELERY_BROKER_URL)
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_TASK_ACKS_LATE = True
+CELERY_TIMEZONE = "UTC"
+CELERY_BEAT_SCHEDULE = {
+    "run-billing-cycle": {
+        "task": "apps.invoicing.tasks.run_billing_cycle_task",
+        "schedule": env.int("TENANTLY_BILLING_INTERVAL_SECONDS", default=600),
+    },
+}
+if not CELERY_BROKER_URL:
+    CELERY_BROKER_URL = "memory://"
+
+# --- Billing rules -----------------------------------------------------------------
+TENANTLY_INVOICE_DUE_DAYS = env.int("TENANTLY_INVOICE_DUE_DAYS", default=7)
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
