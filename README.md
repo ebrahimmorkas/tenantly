@@ -134,6 +134,7 @@ curl -s $API/orgs/acme/invoices/upcoming/ -H "$AUTH"
 ```python
 from apps.webhooks.signing import verify  # or copy this 20-line function
 
+
 def handle(request):
     if not verify(ENDPOINT_SECRET, request.body, request.headers["Tenantly-Signature"]):
         return HttpResponse(status=400)
