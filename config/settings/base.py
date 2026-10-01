@@ -113,6 +113,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.webhooks.tasks.retry_webhook_deliveries",
         "schedule": 60,
     },
+    "purge-idempotency-records": {
+        "task": "apps.core.tasks.purge_idempotency_records",
+        "schedule": 60 * 60 * 6,
+    },
     "retry-failed-payments": {
         "task": "apps.payments.tasks.retry_failed_payments",
         "schedule": 60 * 60,
