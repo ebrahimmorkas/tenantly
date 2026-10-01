@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "apps.metering",
     "apps.invoicing",
     "apps.payments",
+    "apps.webhooks",
 ]
 
 MIDDLEWARE = [
@@ -108,6 +109,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.invoicing.tasks.run_billing_cycle_task",
         "schedule": env.int("TENANTLY_BILLING_INTERVAL_SECONDS", default=600),
     },
+    "retry-webhook-deliveries": {
+        "task": "apps.webhooks.tasks.retry_webhook_deliveries",
+        "schedule": 60,
+    },
     "retry-failed-payments": {
         "task": "apps.payments.tasks.retry_failed_payments",
         "schedule": 60 * 60,
@@ -121,6 +126,12 @@ TENANTLY_INVOICE_DUE_DAYS = env.int("TENANTLY_INVOICE_DUE_DAYS", default=7)
 TENANTLY_DUNNING_SCHEDULE_DAYS = [
     int(days) for days in env.list("TENANTLY_DUNNING_SCHEDULE_DAYS", default=["1", "3", "5"])
 ]
+# Webhook URL safety: HTTPS only and no private networks, unless explicitly relaxed
+# (e.g. to point at a local receiver while developing).
+TENANTLY_WEBHOOK_ALLOW_HTTP = env.bool("TENANTLY_WEBHOOK_ALLOW_HTTP", default=DEBUG)
+TENANTLY_WEBHOOK_ALLOW_PRIVATE_NETWORKS = env.bool(
+    "TENANTLY_WEBHOOK_ALLOW_PRIVATE_NETWORKS", default=False
+)
 TENANTLY_PAYMENT_GATEWAY = env(
     "TENANTLY_PAYMENT_GATEWAY", default="apps.payments.gateways.FakeGateway"
 )
