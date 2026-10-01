@@ -48,7 +48,7 @@ def set_payment_method(organization, token: str) -> PaymentMethod:
 def attempt_payment(invoice_id: int, now=None) -> Payment | None:
     now = now or timezone.now()
     invoice = (
-        Invoice.objects.select_for_update()
+        Invoice.objects.select_for_update(of=("self",))
         .select_related("organization", "subscription")
         .get(pk=invoice_id)
     )
