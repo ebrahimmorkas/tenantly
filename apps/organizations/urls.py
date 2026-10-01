@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from apps.apikeys.views import APIKeyViewSet
 from apps.billing.views import PlanViewSet, SubscriptionViewSet
+from apps.invoicing.views import InvoiceViewSet
 from apps.metering.views import UsageViewSet
 
 from .views import MembershipViewSet, OrganizationViewSet
@@ -17,6 +18,7 @@ tenant_router.register("members", MembershipViewSet, basename="member")
 tenant_router.register("api-keys", APIKeyViewSet, basename="api-key")
 tenant_router.register("subscription", SubscriptionViewSet, basename="subscription")
 tenant_router.register("usage", UsageViewSet, basename="usage")
+tenant_router.register("invoices", InvoiceViewSet, basename="invoice")
 
 urlpatterns = [
     *router.urls,

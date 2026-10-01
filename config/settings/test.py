@@ -10,3 +10,6 @@ STORAGES = {
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
 REST_FRAMEWORK = {**REST_FRAMEWORK, "DEFAULT_THROTTLE_CLASSES": []}
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_BROKER_URL = "memory://"
+CELERY_RESULT_BACKEND = None

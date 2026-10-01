@@ -100,6 +100,14 @@ class InvoiceItem(TimeStampedModel):
     subscription = models.ForeignKey(
         Subscription, on_delete=models.CASCADE, null=True, blank=True, related_name="items"
     )
+    invoice = models.ForeignKey(
+        "invoicing.Invoice",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="items",
+        help_text="Empty while the item is pending.",
+    )
     kind = models.CharField(max_length=12, choices=Kind.choices)
     description = models.CharField(max_length=255)
     quantity = models.PositiveIntegerField(default=1)
