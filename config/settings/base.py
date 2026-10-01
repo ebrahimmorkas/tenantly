@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.organizations",
     "apps.apikeys",
+    "apps.billing",
 ]
 
 MIDDLEWARE = [
