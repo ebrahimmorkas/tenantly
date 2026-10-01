@@ -1,0 +1,12 @@
+Invoice {{ invoice.number }} for {{ invoice.organization.name }}
+
+Issued: {{ invoice.issued_at|date:"M j, Y" }}
+Due:    {{ invoice.due_at|date:"M j, Y" }}
+Status: {{ invoice.get_status_display }}
+
+{% for item, amount in lines %}{{ item.description }}
+    {{ amount }}
+{% endfor %}
+Total: {{ total }}
+{% if invoice.status == "paid" %}
+Nothing to pay, thank you!{% endif %}

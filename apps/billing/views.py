@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from apps.apikeys.authentication import HasScope
 from apps.apikeys.models import Scope
+from apps.invoicing.services import create_invoice
 from apps.organizations.models import Role
 from apps.organizations.tenancy import OrganizationScopedMixin, ReadAnyWriteRole
 
@@ -78,6 +79,7 @@ class SubscriptionViewSet(OrganizationScopedMixin, viewsets.ViewSet):
         subscription = self._run(
             services.subscribe, organization=self.organization, plan=payload.validated_data["plan"]
         )
+        create_invoice(self.organization, subscription=subscription)  # first period, in advance
         return Response(SubscriptionSerializer(subscription).data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
@@ -107,6 +109,8 @@ class SubscriptionViewSet(OrganizationScopedMixin, viewsets.ViewSet):
             subscription=subscription,
             new_plan=payload.validated_data["plan"],
         )
+        if lines:
+            create_invoice(self.organization, subscription=subscription)  # bill proration now
         data = self._change_payload(mode, lines, subscription.plan.currency)
         data["subscription"] = SubscriptionSerializer(self.current()).data
         return Response(data)
