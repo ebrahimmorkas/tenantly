@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Django
+*.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+
+# Environment
+.env
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Celery
+celerybeat-schedule*
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
