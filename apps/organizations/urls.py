@@ -1,6 +1,8 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from apps.apikeys.views import APIKeyViewSet
+
 from .views import MembershipViewSet, OrganizationViewSet
 
 router = DefaultRouter()
@@ -9,6 +11,7 @@ router.register("orgs", OrganizationViewSet, basename="org")
 # Tenant-scoped resources live under /orgs/<org_slug>/...; other apps add theirs here.
 tenant_router = DefaultRouter()
 tenant_router.register("members", MembershipViewSet, basename="member")
+tenant_router.register("api-keys", APIKeyViewSet, basename="api-key")
 
 urlpatterns = [
     *router.urls,

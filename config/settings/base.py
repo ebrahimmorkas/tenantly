@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.organizations",
+    "apps.apikeys",
 ]
 
 MIDDLEWARE = [
@@ -112,6 +113,7 @@ STORAGES = {
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "apps.apikeys.authentication.APIKeyAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
@@ -125,10 +127,12 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
+        "apps.apikeys.authentication.APIKeyRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": env("THROTTLE_ANON", default="60/min"),
         "user": env("THROTTLE_USER", default="600/min"),
+        "api_key": env("THROTTLE_API_KEY", default="1200/min"),
     },
     "EXCEPTION_HANDLER": "apps.core.exceptions.api_exception_handler",
 }
