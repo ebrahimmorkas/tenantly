@@ -29,6 +29,8 @@ class Invoice(TimeStampedModel):
     issued_at = models.DateTimeField()
     due_at = models.DateTimeField()
     paid_at = models.DateTimeField(null=True, blank=True)
+    attempt_count = models.PositiveSmallIntegerField(default=0)
+    next_payment_attempt = models.DateTimeField(null=True, blank=True, db_index=True)
 
     class Meta:
         ordering = ["-issued_at", "-id"]

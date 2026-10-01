@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.billing",
     "apps.metering",
     "apps.invoicing",
+    "apps.payments",
 ]
 
 MIDDLEWARE = [
@@ -107,12 +108,22 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.invoicing.tasks.run_billing_cycle_task",
         "schedule": env.int("TENANTLY_BILLING_INTERVAL_SECONDS", default=600),
     },
+    "retry-failed-payments": {
+        "task": "apps.payments.tasks.retry_failed_payments",
+        "schedule": 60 * 60,
+    },
 }
 if not CELERY_BROKER_URL:
     CELERY_BROKER_URL = "memory://"
 
 # --- Billing rules -----------------------------------------------------------------
 TENANTLY_INVOICE_DUE_DAYS = env.int("TENANTLY_INVOICE_DUE_DAYS", default=7)
+TENANTLY_DUNNING_SCHEDULE_DAYS = [
+    int(days) for days in env.list("TENANTLY_DUNNING_SCHEDULE_DAYS", default=["1", "3", "5"])
+]
+TENANTLY_PAYMENT_GATEWAY = env(
+    "TENANTLY_PAYMENT_GATEWAY", default="apps.payments.gateways.FakeGateway"
+)
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
