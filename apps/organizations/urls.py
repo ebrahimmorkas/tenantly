@@ -6,6 +6,7 @@ from apps.billing.views import PlanViewSet, SubscriptionViewSet
 from apps.invoicing.views import InvoiceViewSet
 from apps.metering.views import UsageViewSet
 from apps.payments.views import PaymentMethodViewSet, PaymentViewSet
+from apps.webhooks.views import WebhookEndpointViewSet
 
 from .views import MembershipViewSet, OrganizationViewSet
 
@@ -22,6 +23,7 @@ tenant_router.register("usage", UsageViewSet, basename="usage")
 tenant_router.register("invoices", InvoiceViewSet, basename="invoice")
 tenant_router.register("payment-method", PaymentMethodViewSet, basename="payment-method")
 tenant_router.register("payments", PaymentViewSet, basename="payment")
+tenant_router.register("webhooks", WebhookEndpointViewSet, basename="webhook")
 
 urlpatterns = [
     *router.urls,
